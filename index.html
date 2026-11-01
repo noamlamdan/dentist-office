@@ -61,11 +61,11 @@
   #swipe svg { width: 58%; }
   @keyframes rise { from { transform: translateY(6px); } to { transform: translateY(-10px); } }
   /* on the artwork's dark floor */
-  footer { position: absolute; z-index: 2; left: 0; right: 0; padding-right: max(22px, env(safe-area-inset-right)); display: flex; align-items: center; justify-content: flex-end; pointer-events: none; }
-  .brand { display: block; padding: 5px 16px; border-radius: 999px; background: var(--white); pointer-events: auto; transition: transform .12s; }
+  footer { position: absolute; z-index: 2; left: 0; right: 0; padding-right: max(44px, calc(env(safe-area-inset-right) + 16px)); display: flex; align-items: center; justify-content: flex-end; pointer-events: none; }
+  .brand { display: block; padding: 6px 20px; border-radius: 999px; background: var(--white); pointer-events: auto; transition: transform .12s; }
   .brand:hover { transform: scale(1.04); }
   .brand:active { transform: scale(.95); }
-  .brand img { display: block; height: 20px; }
+  .brand img { display: block; height: 26px; }
 </style>
 </head>
 <body>
