@@ -20,22 +20,19 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
 <style>
-  :root { --yellow: #F7EC45; --floor: #E3CD22; --plum: #432945; --pink: #F285B5; --white: #fff; }
-  body.outside { --yellow: #F186B5; --floor: #DD5A9A; }
+  :root { --plum: #432945; --pink: #F285B5; --white: #fff; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; background: var(--yellow); color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { min-height: 100dvh; overflow: hidden; }
-  #floor { position: fixed; z-index: 1; left: 0; right: 0; bottom: 0; background: var(--floor); pointer-events: none; }
-  .lang { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); display: flex; padding: 4px; border-radius: 999px; background: var(--white); direction: ltr; }
-  .lang button { min-width: 84px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--plum); font: inherit; font-size: 17px; cursor: pointer; transition: background .2s, transform .12s; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #F7EC45; color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+  /* The movie is the whole page. fit() sizes the stage to the screen and turns it on a phone held upright. */
+  .stage { position: fixed; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
+  video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+  .lang { position: absolute; z-index: 2; top: 12px; left: 12px; display: flex; padding: 4px; border-radius: 999px; background: var(--white); direction: ltr; }
+  .lang button { min-width: 76px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: none; color: var(--plum); font: inherit; font-size: 16px; cursor: pointer; transition: background .2s, transform .12s; }
   .lang button:active { transform: scale(.94); }
   .lang button[aria-pressed=true] { background: var(--pink); color: var(--plum); }
-  main { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
-  .stage { position: relative; width: min(100%, calc(100dvh * 2.2227)); aspect-ratio: 2276 / 1024; overflow: hidden; }
-  video { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--yellow); }
   #hit { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; background: none; cursor: default; touch-action: manipulation; }
   /* the place to press: big and forgiving, with a ripple so the waiting picture stays alive */
-  #spot { position: absolute; width: 19%; aspect-ratio: 1; transform: translate(-50%, -50%); border: 0; padding: 0; border-radius: 50%; background: none; cursor: pointer; touch-action: manipulation; }
+  #spot { position: absolute; z-index: 1; aspect-ratio: 1; transform: translate(-50%, -50%); border: 0; padding: 0; border-radius: 50%; background: none; cursor: pointer; touch-action: manipulation; }
   #spot[hidden] { display: none; }
   #spot::before, #spot::after { content: ''; position: absolute; inset: 22%; border: 4px solid var(--white); border-radius: 50%; opacity: 0; }
   #spot.waiting::before { animation: ripple 1.1s ease-out infinite; }
@@ -52,36 +49,30 @@
   #play svg { width: 44%; margin-inline-start: 6%; direction: ltr; }
   #play[hidden] { display: none; }
   /* on the dark floor, wherever it runs */
-  footer { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; pointer-events: none; }
-  .brand { display: block; padding: 10px 22px; border-radius: 999px; background: var(--white); pointer-events: auto; transition: transform .12s; }
+  /* on the artwork's dark floor */
+  footer { position: absolute; z-index: 2; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 12px; pointer-events: none; }
+  footer.tall { flex-direction: column; gap: 3px; font-size: 13px; }
+  .brand { display: block; padding: 5px 16px; border-radius: 999px; background: var(--white); pointer-events: auto; transition: transform .12s; }
   .brand:hover { transform: scale(1.04); }
   .brand:active { transform: scale(.95); }
-  .brand img { display: block; height: 26px; }
-  @media (max-height: 520px) {                       /* the floor is only a thin band: side by side */
-    footer { flex-direction: row; justify-content: center; gap: 12px; bottom: 3px; font-size: 11px; }
-    .brand { padding: 4px 14px; }
-    .brand img { height: 20px; }
-  }
+  .brand img { display: block; height: 20px; }
 </style>
 </head>
 <body>
-<div id="floor"></div>
-<div class="lang" role="group" aria-label="Language / שפה">
-  <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
-  <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
-</div>
-<main>
-  <div class="stage">
-    <video id="movie" poster="media/poster.jpg" playsinline preload="metadata" disablepictureinpicture></video>
-    <button id="hit" type="button" tabindex="-1" aria-hidden="true"></button>
-    <button id="spot" type="button" aria-label="OK" hidden></button>
-    <button id="play" type="button" aria-label="הפעלה"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1.2 1.2 0 0 0 1.8 1l14-8.5a1.2 1.2 0 0 0 0-2L7.8 2.5a1.2 1.2 0 0 0-1.8 1Z" fill="#F285B5"/></svg></i></button>
+<div class="stage">
+  <video id="movie" poster="media/poster.jpg" playsinline preload="metadata" disablepictureinpicture></video>
+  <button id="hit" type="button" tabindex="-1" aria-hidden="true"></button>
+  <button id="spot" type="button" aria-label="OK" hidden></button>
+  <button id="play" type="button" aria-label="הפעלה"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1.2 1.2 0 0 0 1.8 1l14-8.5a1.2 1.2 0 0 0 0-2L7.8 2.5a1.2 1.2 0 0 0-1.8 1Z" fill="#F285B5"/></svg></i></button>
+  <div class="lang" role="group" aria-label="Language / שפה">
+    <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
+    <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
   </div>
-</main>
-<footer>
-  <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="art/zizzlelab.png" alt="Zizzlelab"></a>
-  <span id="legal">© 2026 Zizzlelab. כל הזכויות שמורות.</span>
-</footer>
+  <footer>
+    <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="art/zizzlelab.png" alt="Zizzlelab"></a>
+    <span id="legal">© 2026 Zizzlelab. כל הזכויות שמורות.</span>
+  </footer>
+</div>
 <script>
   // Each language's line starts, so the toggle lands on the same moment of the story.
   var CUES = {"en": [0.8, 7.7, 12.24, 15.42, 19.0, 22.2, 25.64, 29.32, 33.2, 35.66, 38.86, 43.3, 48.08, 51.9, 55.78, 57.46, 60.56, 64.5, 67.54, 72.06, 75.14, 80.0, 83.16, 88.36, 92.12, 98.04, 104.66, 108.46, 111.06, 114.38, 117.18, 120.68], "he": [0.8, 8.19, 13.97, 17.09, 21.06, 23.93, 27.77, 31.63, 35.81, 38.5, 42.05, 47.39, 52.07, 56.47, 60.76, 62.34, 65.85, 70.06, 73.16, 76.95, 80.28, 84.64, 88.3, 93.34, 97.31, 102.52, 109.37, 113.85, 116.49, 120.0, 122.8, 126.7]};
@@ -94,15 +85,26 @@
   var movie = document.getElementById('movie'), play = document.getElementById('play');
   var buttons = document.querySelectorAll('.lang button');
   var hit = document.getElementById('hit'), spot = document.getElementById('spot');
-  var lang = null, waiting = null, passed = {};
+  var lang = null, waiting = null, live = null, passed = {};                 // live: a gate whose circle is up while the movie runs on to its stop
 
-  // The floor keeps running to the bottom of the screen, and the logo sits on it.
-  function fitFloor() {
-    var box = document.querySelector('.stage').getBoundingClientRect();
-    document.getElementById('floor').style.top = box.bottom - 2 + 'px';
+  // The picture is cut to fill the screen (its middle was drawn to survive that), so its points move with the screen's shape.
+  var VW = 2276, VH = 1024, FLOOR = 918, view = { s: 1, x: 0, y: 0 };
+  var stage = document.querySelector('.stage'), foot = document.querySelector('footer');
+  function fit() {
+    var iw = innerWidth, ih = innerHeight, turn = ih > iw;
+    var w = turn ? ih : iw, h = turn ? iw : ih;
+    stage.style.width = w + 'px';
+    stage.style.height = h + 'px';
+    stage.style.transform = turn ? 'translateX(' + iw + 'px) rotate(90deg)' : 'none';
+    var s = Math.max(w / VW, h / VH);
+    view = { s: s, x: (w - VW * s) / 2, y: (h - VH * s) / 2 };
+    var top = view.y + FLOOR * s, band = h - top;
+    foot.style.top = top + 'px';
+    foot.style.height = band + 'px';
+    foot.classList.toggle('tall', band >= 62);
+    var g = waiting || live;
+    if (g) showSpot(g);
   }
-  addEventListener('resize', fitFloor);
-  fitFloor();
   function saved() {
     try { return localStorage.getItem('dentist-lang'); } catch (e) { return null; }
   }
@@ -150,8 +152,9 @@
   });
   function gate(id) { return GATES[lang].filter(function (g) { return g.id === id; })[0]; }
   function showSpot(g) {
-    spot.style.left = g.x * 100 + '%';
-    spot.style.top = g.y * 100 + '%';
+    spot.style.left = view.x + g.x * VW * view.s + 'px';
+    spot.style.top = view.y + g.y * VH * view.s + 'px';
+    spot.style.width = Math.max(96, 380 * view.s) + 'px';
     spot.hidden = false;
   }
   function wait(g) {
@@ -175,10 +178,8 @@
     movie.play();
     setTimeout(function () { if (!waiting && !live) spot.hidden = true; }, 240);
   }
-  var live = null;                                   // a gate whose circle is up while the movie runs on to its stop
   function watch() {
     var t = movie.currentTime;
-    document.body.classList.toggle('outside', t > 0 && t < GATES[lang][0].cut);
     if (!movie.paused && !waiting) {
       GATES[lang].some(function (g) {
         if (passed[g.id]) return false;
@@ -211,6 +212,8 @@
     document.body.classList.remove('playing');
     movie.currentTime = 0;
   });
+  addEventListener('resize', fit);
+  fit();
   setLang(firstLang(), false);
 </script>
 </body>
