@@ -6,6 +6,12 @@
 <meta name="copyright" content="© 2026 Zizzlelab. All rights reserved.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F7EC45">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dentist">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="art/home-icon.png">
 <title>ביקור במרפאת השיניים | Zizzle Inventions</title>
 <meta name="description" content="סרטון קצר שמכיר לילדים את מרפאת השיניים: הכיסא, המנורה, צילום הרנטגן והכלים.">
 <meta property="og:type" content="website">
@@ -66,6 +72,7 @@
   .brand:hover { transform: scale(1.04); }
   .brand:active { transform: scale(.95); }
   .brand img { display: block; height: 26px; }
+  @media (max-height: 520px), (max-width: 520px) { .brand { padding: 5px 16px; } .brand img { height: 21px; } }   /* a phone's floor is only about 40px tall */
 </style>
 </head>
 <body>
@@ -106,7 +113,7 @@
   addEventListener('touchend', function () { touching = false; fit(); }, { passive: true });
   function fit() {
     var iw = innerWidth, ih = innerHeight, turn = ih > iw;
-    var roll = !turn && ih < 520 && navigator.maxTouchPoints > 0;
+    var roll = !turn && ih < 520 && navigator.maxTouchPoints > 0 && !navigator.standalone;       // from the Home Screen there are no bars to swipe away
     document.documentElement.classList.toggle('roll', roll);
     var barsUp = roll && Math.min(screen.width, screen.height) - ih > 30;
     document.getElementById('swipe').hidden = !barsUp;
@@ -222,7 +229,12 @@
       play.hidden = false;
     }
   });
-  play.addEventListener('click', function () { play.hidden = true; movie.play(); });
+  function goFull() {          // Android and iPad can hide the browser's bars; iPhone Safari cannot, so there this does nothing
+    var root = document.documentElement, full = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (!full || navigator.maxTouchPoints === 0 || document.fullscreenElement || document.webkitFullscreenElement) return;
+    try { var p = full.call(root); if (p && p.catch) p.catch(function () {}); } catch (e) {}
+  }
+  play.addEventListener('click', function () { play.hidden = true; goFull(); movie.play(); });
   movie.addEventListener('play', function () { play.hidden = true; document.body.classList.add('playing'); });
   movie.addEventListener('pause', function () { if (!waiting) document.body.classList.remove('playing'); });
   movie.addEventListener('ended', function () {
