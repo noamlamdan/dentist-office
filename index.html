@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex">
+<meta name="copyright" content="© 2026 Zizzlelab. All rights reserved.">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F7EC45">
 <title>ביקור במרפאת השיניים | Zizzle Inventions</title>
@@ -80,7 +81,6 @@
   <div id="swipe" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="M12 20V5M5 11.5 12 4.5l7 7" fill="none" stroke="#F285B5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <footer>
     <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="art/zizzlelab.png" alt="Zizzlelab"></a>
-    <span id="legal">© 2026 Zizzlelab. כל הזכויות שמורות.</span>
   </footer>
 </div>
 <script>
@@ -89,8 +89,8 @@
   // Where the movie stops until the child presses the white circle.
   var GATES = {"en": [{"id": "door", "on": 4.0, "stop": 6.35, "x": 0.5712, "y": 0.6465, "cut": 7.75}, {"id": "chair_p", "on": 16.7, "stop": 18.94, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 23.14, "stop": 24.42, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 30.7, "stop": 31.98, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 36.56, "stop": 38.61, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 49.6, "stop": 51.54, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 58.46, "stop": 60.41, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 65.44, "stop": 67.39, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 73.04, "stop": 74.99, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 81.06, "stop": 83.01, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 89.62, "stop": 90.9, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 106.16, "stop": 107.71, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 118.18, "stop": 119.46, "x": 0.4921, "y": 0.3359}], "he": [{"id": "door", "on": 4.49, "stop": 6.84, "x": 0.5712, "y": 0.6465, "cut": 8.24}, {"id": "chair_p", "on": 18.76, "stop": 21.0, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 25.27, "stop": 26.55, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 33.31, "stop": 34.59, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 39.75, "stop": 41.8, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 54.17, "stop": 56.11, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 63.75, "stop": 65.7, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 71.06, "stop": 73.01, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 78.18, "stop": 80.13, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 86.2, "stop": 88.15, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 94.81, "stop": 96.09, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 111.55, "stop": 113.1, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 124.2, "stop": 125.48, "x": 0.4921, "y": 0.3359}]};
   var WORDS = {
-    he: { dir: 'rtl', page: 'ביקור במרפאת השיניים | Zizzle Inventions', legal: '© 2026 Zizzlelab. כל הזכויות שמורות.', play: 'הפעלה' },
-    en: { dir: 'ltr', page: 'A visit to the dentist | Zizzle Inventions', legal: '© 2026 Zizzlelab. All rights reserved.', play: 'Play' }
+    he: { dir: 'rtl', page: 'ביקור במרפאת השיניים | Zizzle Inventions', play: 'הפעלה' },
+    en: { dir: 'ltr', page: 'A visit to the dentist | Zizzle Inventions', play: 'Play' }
   };
   var movie = document.getElementById('movie'), play = document.getElementById('play');
   var buttons = document.querySelectorAll('.lang button');
@@ -152,7 +152,6 @@
     document.documentElement.lang = l;
     document.documentElement.dir = w.dir;
     document.title = w.page;
-    document.getElementById('legal').textContent = w.legal;
     play.setAttribute('aria-label', w.play);
     buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === l)); });
     movie.src = 'media/' + l + '.mp4';
