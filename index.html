@@ -25,7 +25,7 @@
   html, body { margin: 0; height: 100%; overflow: hidden; background: #F7EC45; color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
   /* Sideways on a phone the page gets room to scroll: that is the only thing that lets Safari fold its bar away. */
   html.roll, html.roll body { height: auto; overflow: visible; }
-  html.roll body { min-height: 200vh; }
+  html.roll body { min-height: 1000vh; }
   /* The movie is the whole page. fit() sizes the stage to the screen and turns it on a phone held upright. */
   .stage { position: fixed; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
   video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -100,11 +100,18 @@
   // The picture is cut to fill the screen (its middle was drawn to survive that), so its points move with the screen's shape.
   var VW = 2276, VH = 1024, FLOOR = 918, view = { s: 1, x: 0, y: 0 };
   var stage = document.querySelector('.stage'), foot = document.querySelector('footer');
+  var touching = false, rewind = 0;
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  addEventListener('touchstart', function () { touching = true; }, { passive: true });
+  addEventListener('touchend', function () { touching = false; fit(); }, { passive: true });
   function fit() {
     var iw = innerWidth, ih = innerHeight, turn = ih > iw;
     var roll = !turn && ih < 520 && navigator.maxTouchPoints > 0;
     document.documentElement.classList.toggle('roll', roll);
-    document.getElementById('swipe').hidden = !(roll && Math.min(screen.width, screen.height) - ih > 30);
+    var barsUp = roll && Math.min(screen.width, screen.height) - ih > 30;
+    document.getElementById('swipe').hidden = !barsUp;
+    clearTimeout(rewind);
+    if (barsUp) rewind = setTimeout(function () { if (!touching && scrollY > 0) scrollTo(0, 0); }, 700);     // Safari's bar came back: leave room to swipe it away again
     var w = turn ? ih : iw, h = turn ? iw : ih;
     stage.style.width = w + 'px';
     stage.style.height = h + 'px';
