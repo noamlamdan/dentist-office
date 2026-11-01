@@ -25,7 +25,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; background: var(--yellow); color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
   body { min-height: 100dvh; overflow: hidden; }
-  #floor { position: fixed; left: 0; right: 0; bottom: 0; background: var(--floor); }
+  #floor { position: fixed; z-index: 1; left: 0; right: 0; bottom: 0; background: var(--floor); pointer-events: none; }
   .lang { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); display: flex; padding: 4px; border-radius: 999px; background: var(--white); direction: ltr; }
   .lang button { min-width: 84px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--plum); font: inherit; font-size: 17px; cursor: pointer; transition: background .2s, transform .12s; }
   .lang button:active { transform: scale(.94); }
@@ -52,7 +52,7 @@
   #play svg { width: 44%; margin-inline-start: 6%; direction: ltr; }
   #play[hidden] { display: none; }
   /* on the dark floor, wherever it runs */
-  footer { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; pointer-events: none; }
+  footer { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; pointer-events: none; }
   .brand { display: block; padding: 10px 22px; border-radius: 999px; background: var(--white); pointer-events: auto; transition: transform .12s; }
   .brand:hover { transform: scale(1.04); }
   .brand:active { transform: scale(.95); }
@@ -99,7 +99,7 @@
   // The floor keeps running to the bottom of the screen, and the logo sits on it.
   function fitFloor() {
     var box = document.querySelector('.stage').getBoundingClientRect();
-    document.getElementById('floor').style.top = box.bottom - 1 + 'px';
+    document.getElementById('floor').style.top = box.bottom - 2 + 'px';
   }
   addEventListener('resize', fitFloor);
   fitFloor();
