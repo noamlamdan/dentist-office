@@ -52,8 +52,16 @@
   #play svg { width: 44%; margin-inline-start: 6%; direction: ltr; }
   #play[hidden] { display: none; }
   /* on the dark floor, wherever it runs */
-  footer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: clamp(10px, 1.5vw, 13px); pointer-events: none; }
-  footer img { height: clamp(14px, 2.4vw, 24px); display: block; filter: brightness(0); opacity: .78; }   /* one colour: its yellow letters vanish on the floor */
+  footer { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; pointer-events: none; }
+  .brand { display: block; padding: 10px 22px; border-radius: 999px; background: var(--white); pointer-events: auto; transition: transform .12s; }
+  .brand:hover { transform: scale(1.04); }
+  .brand:active { transform: scale(.95); }
+  .brand img { display: block; height: 26px; }
+  @media (max-height: 520px) {                       /* the floor is only a thin band: side by side */
+    footer { flex-direction: row; justify-content: center; gap: 12px; bottom: 3px; font-size: 11px; }
+    .brand { padding: 4px 14px; }
+    .brand img { height: 20px; }
+  }
 </style>
 </head>
 <body>
@@ -71,7 +79,7 @@
   </div>
 </main>
 <footer>
-  <img src="art/zizzlelab.png" alt="Zizzlelab">
+  <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="art/zizzlelab.png" alt="Zizzlelab"></a>
   <span id="legal">© 2026 Zizzlelab. כל הזכויות שמורות.</span>
 </footer>
 <script>
@@ -89,11 +97,9 @@
   var lang = null, waiting = null, passed = {};
 
   // The floor keeps running to the bottom of the screen, and the logo sits on it.
-  var FLOOR_TOP = 918 / 1024;                         // where the floor starts in the picture
   function fitFloor() {
     var box = document.querySelector('.stage').getBoundingClientRect();
     document.getElementById('floor').style.top = box.bottom - 1 + 'px';
-    document.querySelector('footer').style.top = box.top + box.height * FLOOR_TOP + 'px';
   }
   addEventListener('resize', fitFloor);
   fitFloor();
