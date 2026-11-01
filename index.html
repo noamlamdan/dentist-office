@@ -20,17 +20,18 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
 <style>
-  :root { --yellow: #F7EC45; --plum: #432945; --pink: #F285B5; --white: #fff; }
+  :root { --yellow: #F7EC45; --floor: #E3CD22; --plum: #432945; --pink: #F285B5; --white: #fff; }
+  body.outside { --yellow: #F186B5; --floor: #DD5A9A; }
   * { box-sizing: border-box; }
   html, body { margin: 0; min-height: 100%; background: var(--yellow); color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { min-height: 100dvh; display: flex; flex-direction: column; padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom)); }
-  header { display: flex; align-items: center; justify-content: flex-end; gap: 12px; max-width: 1180px; width: 100%; margin: 0 auto; }
-  .lang { display: flex; flex: none; padding: 4px; border-radius: 999px; background: var(--white); direction: ltr; }
+  body { min-height: 100dvh; overflow: hidden; }
+  #floor { position: fixed; left: 0; right: 0; bottom: 0; background: var(--floor); }
+  .lang { position: fixed; z-index: 2; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); display: flex; padding: 4px; border-radius: 999px; background: var(--white); direction: ltr; }
   .lang button { min-width: 84px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--plum); font: inherit; font-size: 17px; cursor: pointer; transition: background .2s, transform .12s; }
   .lang button:active { transform: scale(.94); }
   .lang button[aria-pressed=true] { background: var(--pink); color: var(--plum); }
-  main { flex: 1; display: flex; align-items: center; justify-content: center; margin-inline: -16px; min-height: 0; padding: 10px 0; }
-  .stage { position: relative; width: min(100%, calc((100dvh - 110px) * 2.2227)); aspect-ratio: 2276 / 1024; overflow: hidden; }
+  main { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .stage { position: relative; width: min(100%, calc(100dvh * 2.2227)); aspect-ratio: 2276 / 1024; overflow: hidden; }
   video { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--yellow); }
   #hit { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; background: none; cursor: default; touch-action: manipulation; }
   /* the place to press: big and forgiving, with a ripple so the waiting picture stays alive */
@@ -50,27 +51,17 @@
   #play:active i { transform: scale(.94); }
   #play svg { width: 44%; margin-inline-start: 6%; direction: ltr; }
   #play[hidden] { display: none; }
-  footer { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; font-size: 13px; }
-  footer img { height: 24px; display: block; }
-  @media (max-height: 520px) {
-    body { padding: 6px 10px; }
-    main { margin-inline: -10px; }
-    footer { display: none; }
-    header { position: fixed; top: 6px; inset-inline-end: 10px; width: auto; z-index: 2; transition: opacity .25s; }
-    body.playing header { opacity: 0; pointer-events: none; }
-    .lang button { min-height: 38px; min-width: 72px; }
-    .stage { width: min(100%, calc((100dvh - 12px) * 2.2227)); }
-    main { padding: 0; }
-  }
+  /* on the dark floor, wherever it runs */
+  footer { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: clamp(10px, 1.5vw, 13px); pointer-events: none; }
+  footer img { height: clamp(14px, 2.4vw, 24px); display: block; filter: brightness(0); opacity: .78; }   /* one colour: its yellow letters vanish on the floor */
 </style>
 </head>
 <body>
-<header>
-  <div class="lang" role="group" aria-label="Language / שפה">
-    <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
-    <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
-  </div>
-</header>
+<div id="floor"></div>
+<div class="lang" role="group" aria-label="Language / שפה">
+  <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
+  <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
+</div>
 <main>
   <div class="stage">
     <video id="movie" poster="media/poster.jpg" playsinline preload="metadata" disablepictureinpicture></video>
@@ -87,7 +78,7 @@
   // Each language's line starts, so the toggle lands on the same moment of the story.
   var CUES = {"en": [0.8, 7.7, 12.24, 15.42, 19.0, 22.2, 25.64, 29.32, 33.2, 35.66, 38.86, 43.3, 48.08, 51.9, 55.78, 57.46, 60.56, 64.5, 67.54, 72.06, 75.14, 80.0, 83.16, 88.36, 92.12, 98.04, 104.66, 108.46, 111.06, 114.38, 117.18, 120.68], "he": [0.8, 8.19, 13.97, 17.09, 21.06, 23.93, 27.77, 31.63, 35.81, 38.5, 42.05, 47.39, 52.07, 56.47, 60.76, 62.34, 65.85, 70.06, 73.16, 76.95, 80.28, 84.64, 88.3, 93.34, 97.31, 102.52, 109.37, 113.85, 116.49, 120.0, 122.8, 126.7]};
   // Where the movie stops until the child presses the white circle.
-  var GATES = {"en": [{"id": "door", "on": 4.0, "stop": 6.35, "x": 0.5712, "y": 0.6465}, {"id": "chair_p", "on": 16.7, "stop": 18.94, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 23.14, "stop": 24.42, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 30.7, "stop": 31.98, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 36.56, "stop": 38.61, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 49.6, "stop": 51.54, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 58.46, "stop": 60.41, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 65.44, "stop": 67.39, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 73.04, "stop": 74.99, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 81.06, "stop": 83.01, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 89.62, "stop": 90.9, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 106.16, "stop": 107.71, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 118.18, "stop": 119.46, "x": 0.4921, "y": 0.3359}], "he": [{"id": "door", "on": 4.49, "stop": 6.84, "x": 0.5712, "y": 0.6465}, {"id": "chair_p", "on": 18.76, "stop": 21.0, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 25.27, "stop": 26.55, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 33.31, "stop": 34.59, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 39.75, "stop": 41.8, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 54.17, "stop": 56.11, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 63.75, "stop": 65.7, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 71.06, "stop": 73.01, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 78.18, "stop": 80.13, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 86.2, "stop": 88.15, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 94.81, "stop": 96.09, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 111.55, "stop": 113.1, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 124.2, "stop": 125.48, "x": 0.4921, "y": 0.3359}]};
+  var GATES = {"en": [{"id": "door", "on": 4.0, "stop": 6.35, "x": 0.5712, "y": 0.6465, "cut": 7.75}, {"id": "chair_p", "on": 16.7, "stop": 18.94, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 23.14, "stop": 24.42, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 30.7, "stop": 31.98, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 36.56, "stop": 38.61, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 49.6, "stop": 51.54, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 58.46, "stop": 60.41, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 65.44, "stop": 67.39, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 73.04, "stop": 74.99, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 81.06, "stop": 83.01, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 89.62, "stop": 90.9, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 106.16, "stop": 107.71, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 118.18, "stop": 119.46, "x": 0.4921, "y": 0.3359}], "he": [{"id": "door", "on": 4.49, "stop": 6.84, "x": 0.5712, "y": 0.6465, "cut": 8.24}, {"id": "chair_p", "on": 18.76, "stop": 21.0, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 25.27, "stop": 26.55, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 33.31, "stop": 34.59, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 39.75, "stop": 41.8, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 54.17, "stop": 56.11, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 63.75, "stop": 65.7, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 71.06, "stop": 73.01, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 78.18, "stop": 80.13, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 86.2, "stop": 88.15, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 94.81, "stop": 96.09, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 111.55, "stop": 113.1, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 124.2, "stop": 125.48, "x": 0.4921, "y": 0.3359}]};
   var WORDS = {
     he: { dir: 'rtl', page: 'ביקור במרפאת השיניים | Zizzle Inventions', legal: '© 2026 Zizzlelab. כל הזכויות שמורות.', play: 'הפעלה' },
     en: { dir: 'ltr', page: 'A visit to the dentist | Zizzle Inventions', legal: '© 2026 Zizzlelab. All rights reserved.', play: 'Play' }
@@ -97,6 +88,15 @@
   var hit = document.getElementById('hit'), spot = document.getElementById('spot');
   var lang = null, waiting = null, passed = {};
 
+  // The floor keeps running to the bottom of the screen, and the logo sits on it.
+  var FLOOR_TOP = 918 / 1024;                         // where the floor starts in the picture
+  function fitFloor() {
+    var box = document.querySelector('.stage').getBoundingClientRect();
+    document.getElementById('floor').style.top = box.bottom - 1 + 'px';
+    document.querySelector('footer').style.top = box.top + box.height * FLOOR_TOP + 'px';
+  }
+  addEventListener('resize', fitFloor);
+  fitFloor();
   function saved() {
     try { return localStorage.getItem('dentist-lang'); } catch (e) { return null; }
   }
@@ -172,6 +172,7 @@
   var live = null;                                   // a gate whose circle is up while the movie runs on to its stop
   function watch() {
     var t = movie.currentTime;
+    document.body.classList.toggle('outside', t > 0 && t < GATES[lang][0].cut);
     if (!movie.paused && !waiting) {
       GATES[lang].some(function (g) {
         if (passed[g.id]) return false;
