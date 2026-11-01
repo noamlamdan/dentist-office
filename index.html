@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7EC45">
+<title>ביקור במרפאת השיניים | Zizzle Inventions</title>
+<meta name="description" content="סרטון קצר שמכיר לילדים את מרפאת השיניים: הכיסא, המנורה, צילום הרנטגן והכלים.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Zizzle Inventions">
+<meta property="og:title" content="ביקור במרפאת השיניים">
+<meta property="og:description" content="סרטון קצר שמכיר לילדים את מרפאת השיניים: הכיסא, המנורה, צילום הרנטגן והכלים.">
+<meta property="og:image" content="https://noamlamdan.github.io/dentist-office/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="art/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+<style>
+  :root { --yellow: #F7EC45; --plum: #432945; --pink: #F285B5; --white: #fff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--yellow); color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { min-height: 100dvh; display: flex; flex-direction: column; padding: max(14px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom)); }
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 1180px; width: 100%; margin: 0 auto; }
+  h1 { margin: 0; font-size: clamp(20px, 3.4vw, 32px); line-height: 1.2; font-weight: 400; }
+  .lang { display: flex; flex: none; padding: 4px; border-radius: 999px; background: var(--white); direction: ltr; }
+  .lang button { min-width: 84px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: var(--plum); font: inherit; font-size: 17px; cursor: pointer; transition: background .2s, transform .12s; }
+  .lang button:active { transform: scale(.94); }
+  .lang button[aria-pressed=true] { background: var(--pink); color: var(--plum); }
+  main { flex: 1; display: flex; align-items: center; justify-content: center; margin-inline: -16px; min-height: 0; padding: 10px 0; }
+  .stage { position: relative; width: 100%; aspect-ratio: 2276 / 1024; max-height: calc(100dvh - 150px); overflow: hidden; }
+  video { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--yellow); }
+  #play { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; border: 0; background: none; cursor: pointer; padding: 0; }
+  #play i { display: grid; place-items: center; width: clamp(72px, 13vw, 118px); aspect-ratio: 1; border-radius: 50%; background: var(--white); box-shadow: 0 6px 0 rgba(67, 41, 69, .16); transition: transform .14s; }
+  #play:hover i { transform: scale(1.06); }
+  #play:active i { transform: scale(.94); }
+  #play svg { width: 44%; margin-inline-start: 6%; direction: ltr; }
+  #play[hidden] { display: none; }
+  footer { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; font-size: 13px; }
+  footer img { height: 24px; display: block; }
+  @media (max-height: 520px) {
+    body { padding: 6px 10px; }
+    main { margin-inline: -10px; }
+    h1, footer { display: none; }
+    header { position: fixed; top: 6px; inset-inline-end: 10px; width: auto; z-index: 2; transition: opacity .25s; }
+    body.playing header { opacity: 0; pointer-events: none; }
+    .lang button { min-height: 38px; min-width: 72px; }
+    .stage { max-height: calc(100dvh - 12px); }
+    main { padding: 0; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">ביקור במרפאת השיניים</h1>
+  <div class="lang" role="group" aria-label="Language / שפה">
+    <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
+    <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
+  </div>
+</header>
+<main>
+  <div class="stage">
+    <video id="movie" poster="media/poster.jpg" playsinline preload="metadata" controlslist="nodownload noplaybackrate" disablepictureinpicture></video>
+    <button id="play" type="button" aria-label="הפעלה"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1.2 1.2 0 0 0 1.8 1l14-8.5a1.2 1.2 0 0 0 0-2L7.8 2.5a1.2 1.2 0 0 0-1.8 1Z" fill="#F285B5"/></svg></i></button>
+  </div>
+</main>
+<footer>
+  <img src="art/zizzlelab.png" alt="Zizzlelab">
+  <span id="legal">© 2026 Zizzlelab. כל הזכויות שמורות.</span>
+</footer>
+<script>
+  // Each language's line starts, so the toggle lands on the same moment of the story.
+  var CUES = {"en": [0.8, 7.7, 12.24, 15.42, 19.0, 22.2, 25.64, 29.32, 33.2, 35.66, 38.86, 43.3, 48.08, 51.9, 55.78, 57.46, 60.56, 64.5, 67.54, 72.06, 75.14, 80.0, 83.16, 88.36, 92.12, 98.04, 104.66, 108.46, 111.06, 114.38, 117.18, 120.68], "he": [0.8, 8.19, 13.97, 17.77, 21.74, 24.61, 28.45, 32.31, 36.6, 39.38, 42.93, 48.27, 52.95, 57.35, 61.64, 63.22, 66.73, 70.94, 74.04, 77.83, 81.16, 85.33, 88.99, 94.03, 98.11, 103.32, 110.17, 114.48, 117.12, 120.63, 123.43, 127.37]};
+  var WORDS = {
+    he: { dir: 'rtl', title: 'ביקור במרפאת השיניים', page: 'ביקור במרפאת השיניים | Zizzle Inventions', legal: '© 2026 Zizzlelab. כל הזכויות שמורות.', play: 'הפעלה' },
+    en: { dir: 'ltr', title: 'A visit to the dentist', page: 'A visit to the dentist | Zizzle Inventions', legal: '© 2026 Zizzlelab. All rights reserved.', play: 'Play' }
+  };
+  var movie = document.getElementById('movie'), play = document.getElementById('play');
+  var buttons = document.querySelectorAll('.lang button');
+  var lang = null;
+
+  function saved() {
+    try { return localStorage.getItem('dentist-lang'); } catch (e) { return null; }
+  }
+  function remember(l) {
+    try { localStorage.setItem('dentist-lang', l); } catch (e) {}
+  }
+  function firstLang() {
+    var asked = new URLSearchParams(location.search).get('lang');
+    if (WORDS[asked]) return asked;
+    if (WORDS[saved()]) return saved();
+    return /^(he|iw)\b/i.test(navigator.language || '') ? 'he' : 'en';
+  }
+  // the same point of the same line, in the other language
+  function sameMoment(t, from, to) {
+    var a = CUES[from], b = CUES[to], i = a.length - 1;
+    while (i > 0 && a[i] > t) i--;
+    if (i === a.length - 1) return b[i] + Math.max(0, t - a[i]);
+    return b[i] + (t - a[i]) / (a[i + 1] - a[i]) * (b[i + 1] - b[i]);
+  }
+  function setLang(l, keep) {
+    if (l === lang) return;
+    var from = lang, t = movie.currentTime, going = !movie.paused;
+    lang = l;
+    var w = WORDS[l];
+    document.documentElement.lang = l;
+    document.documentElement.dir = w.dir;
+    document.title = w.page;
+    document.getElementById('title').textContent = w.title;
+    document.getElementById('legal').textContent = w.legal;
+    play.setAttribute('aria-label', w.play);
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === l)); });
+    movie.src = 'media/' + l + '.mp4';
+    if (keep && from && t > 0) {
+      movie.addEventListener('loadedmetadata', function () {
+        movie.currentTime = sameMoment(t, from, l);
+        if (going) movie.play();
+      }, { once: true });
+    }
+  }
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.dataset.lang, true); remember(lang); });
+  });
+  play.addEventListener('click', function () {
+    movie.controls = true;
+    movie.play();
+    if (innerWidth < innerHeight && innerWidth < 600) {         // a phone held upright: the movie is wide, give it the whole screen
+      try { (movie.webkitEnterFullscreen || movie.requestFullscreen).call(movie); } catch (e) {}
+    }
+  });
+  movie.addEventListener('play', function () { play.hidden = true; document.body.classList.add('playing'); });
+  movie.addEventListener('pause', function () { document.body.classList.remove('playing'); });
+  movie.addEventListener('ended', function () { play.hidden = false; movie.controls = false; movie.currentTime = 0; });
+  setLang(firstLang(), false);
+</script>
+</body>
+</html>
