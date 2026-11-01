@@ -23,6 +23,9 @@
   :root { --plum: #432945; --pink: #F285B5; --white: #fff; }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #F7EC45; color: var(--plum); font-family: 'Varela Round', ui-rounded, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+  /* Sideways on a phone the page gets room to scroll: that is the only thing that lets Safari fold its bar away. */
+  html.roll, html.roll body { height: auto; overflow: visible; }
+  html.roll body { min-height: 200vh; }
   /* The movie is the whole page. fit() sizes the stage to the screen and turns it on a phone held upright. */
   .stage { position: fixed; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
   video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -49,6 +52,11 @@
   #play svg { width: 44%; margin-inline-start: 6%; direction: ltr; }
   #play[hidden] { display: none; }
   /* on the dark floor, wherever it runs */
+  /* sideways on a phone with Safari's bar still up: a bouncing arrow says swipe up */
+  #swipe { position: absolute; z-index: 2; right: 16px; bottom: 12px; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--white); pointer-events: none; animation: rise 1s ease-in-out infinite alternate; }
+  #swipe[hidden] { display: none; }
+  #swipe svg { width: 58%; }
+  @keyframes rise { from { transform: translateY(6px); } to { transform: translateY(-10px); } }
   /* on the artwork's dark floor */
   footer { position: absolute; z-index: 2; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 12px; pointer-events: none; }
   footer.tall { flex-direction: column; gap: 9px; font-size: 13px; }
@@ -68,6 +76,7 @@
     <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
     <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
   </div>
+  <div id="swipe" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="M12 20V5M5 11.5 12 4.5l7 7" fill="none" stroke="#F285B5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <footer>
     <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="art/zizzlelab.png" alt="Zizzlelab"></a>
     <span id="legal">© 2026 Zizzlelab. כל הזכויות שמורות.</span>
@@ -92,6 +101,9 @@
   var stage = document.querySelector('.stage'), foot = document.querySelector('footer');
   function fit() {
     var iw = innerWidth, ih = innerHeight, turn = ih > iw;
+    var roll = !turn && ih < 520 && navigator.maxTouchPoints > 0;
+    document.documentElement.classList.toggle('roll', roll);
+    document.getElementById('swipe').hidden = !(roll && Math.min(screen.width, screen.height) - ih > 30);
     var w = turn ? ih : iw, h = turn ? iw : ih;
     stage.style.width = w + 'px';
     stage.style.height = h + 'px';
@@ -194,7 +206,7 @@
   spot.addEventListener('pointerdown', function (e) { e.preventDefault(); pressed(); });
   spot.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') pressed(); });
   // a press anywhere else: the circle bounces while waiting; otherwise it pauses or carries on
-  hit.addEventListener('pointerdown', function () {
+  hit.addEventListener('click', function () {
     if (waiting) {
       spot.classList.remove('nudge');
       void spot.offsetWidth;
@@ -213,6 +225,11 @@
     movie.currentTime = 0;
   });
   addEventListener('resize', fit);
+  addEventListener('scroll', fit, { passive: true });
+  if (window.visualViewport) visualViewport.addEventListener('resize', fit);
+  addEventListener('orientationchange', function () {   // Safari reports the new size a moment after turning
+    [50, 250, 600].forEach(function (ms) { setTimeout(fit, ms); });
+  });
   fit();
   setLang(firstLang(), false);
 </script>
