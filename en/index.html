@@ -36,8 +36,17 @@
   /* The movie is the whole page. fit() sizes the stage to the screen and turns it on a phone held upright. */
   .stage { position: fixed; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
   video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-  .lang { position: absolute; z-index: 2; top: 20px; left: max(22px, env(safe-area-inset-left)); display: flex; padding: 2px; transform-origin: 0 0; border-radius: 999px; background: var(--white); direction: ltr; }
-  @media (hover: hover) and (pointer: fine) { .lang { transform: scale(1.25); } }   /* a mouse is less exact, and the screen is big */
+  .lang { position: absolute; z-index: 2; top: 20px; left: calc(max(22px, env(safe-area-inset-left)) + 38px); display: flex; padding: 2px; transform-origin: 0 0; border-radius: 999px; background: var(--white); direction: ltr; }
+  /* the CC button (the Syringe's speech bubble): turns the words on and off, pink while they show */
+  #cc { position: absolute; z-index: 2; top: 18px; left: max(22px, env(safe-area-inset-left)); width: 30px; height: 30px; padding: 0; border: 0; border-radius: 50%; transform-origin: 0 0; background: var(--plum) url("../art/cc_icon.png") center / 100% 100% no-repeat; cursor: pointer; transition: background-color .15s; }
+  #cc::after { content: ''; position: absolute; inset: -10px; }
+  #cc:active { filter: brightness(.9); }
+  #cc[aria-pressed=true] { background-color: var(--pink); }
+  @media (hover: hover) and (pointer: fine) { .lang, #cc { transform: scale(1.25); } .lang { left: calc(max(22px, env(safe-area-inset-left)) + 47px); } }   /* a mouse is less exact, and the screen is big */
+  /* the words being spoken, while CC is on */
+  #cap { position: absolute; z-index: 2; left: 50%; top: 16px; transform: translateX(-50%); width: max-content; max-width: min(58%, 620px); padding: 9px 20px; border-radius: 18px; background: var(--white); color: var(--plum); box-shadow: 0 4px 0 rgba(67, 41, 69, .16); font-size: 17px; line-height: 1.3; text-align: center; text-wrap: balance; pointer-events: none; }
+  #cap[hidden] { display: none; }
+  @media (max-height: 520px), (max-width: 520px) { #cap { top: 12px; padding: 6px 14px; font-size: 13px; border-radius: 14px; } }
   .lang button { position: relative; min-width: 38px; min-height: 22px; padding: 0 7px; border: 0; border-radius: 999px; background: none; color: var(--plum); font: inherit; font-size: 11px; cursor: pointer; transition: background .2s, transform .12s; }
   .lang button:active { transform: scale(.94); }
   .lang button::after { content: ''; position: absolute; inset: -10px -2px; }   /* small to see, still easy to hit */
@@ -81,6 +90,8 @@
   <button id="hit" type="button" tabindex="-1" aria-hidden="true"></button>
   <button id="spot" type="button" aria-label="OK" hidden></button>
   <button id="play" type="button" aria-label="Play"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1.2 1.2 0 0 0 1.8 1l14-8.5a1.2 1.2 0 0 0 0-2L7.8 2.5a1.2 1.2 0 0 0-1.8 1Z" fill="#F285B5"/></svg></i></button>
+  <button id="cc" type="button" aria-pressed="false" aria-label="Captions / כתוביות"></button>
+  <div id="cap" hidden></div>
   <div id="swipe" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="M12 20V5M5 11.5 12 4.5l7 7" fill="none" stroke="#F285B5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <footer>
     <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="../art/zizzlelab.png" alt="Zizzlelab"></a>
@@ -89,6 +100,8 @@
 <script>
   // Each language's line starts, so the toggle lands on the same moment of the story.
   var CUES = {"en": [0.8, 7.7, 12.24, 15.42, 19.0, 22.2, 25.64, 29.32, 33.2, 35.66, 38.86, 43.3, 48.08, 51.9, 55.78, 57.46, 60.56, 64.5, 67.54, 72.06, 75.14, 80.0, 83.16, 88.36, 92.12, 98.04, 104.66, 108.46, 111.06, 114.38, 117.18, 120.68], "he": [0.8, 8.19, 13.97, 17.09, 21.06, 23.93, 27.77, 31.63, 35.81, 38.5, 42.05, 47.39, 52.07, 56.47, 60.76, 62.34, 65.85, 70.06, 73.16, 76.95, 80.28, 84.64, 88.3, 93.34, 97.31, 102.52, 109.37, 113.85, 116.49, 120.0, 122.8, 126.7]};
+  // The words of each line and when they are said, for the captions.
+  var CAPS = {"en": [[0.8, 4.3, "This is the dentist's office. Tap the door to go in!"], [7.7, 11.64, "This room is full of cool inventions, and they all help your teeth."], [12.24, 15.02, "Here is the coolest chair you've ever seen."], [15.42, 17.0, "Tap the chair to make it go up."], [19.0, 21.7, "Up... up... up!"], [22.2, 23.44, "Push the chair back."], [25.64, 28.72, "It tips back, like a spaceship getting ready to fly."], [29.32, 31.0, "Drag the bib onto Yeti."], [33.2, 35.06, "A tiny chain holds it on."], [35.66, 36.86, "Tap the big light."], [38.86, 42.6, "It's like a little sun, so the dentist can see all your teeth."], [43.3, 47.68, "This is the X-ray machine. Sometimes it takes a picture of your teeth."], [48.08, 49.9, "Tap the machine, and hold still."], [51.9, 55.08, "Click! Now you can see your teeth from the inside!"], [55.78, 57.06, "And here are the tools!"], [57.46, 58.76, "Tap the tiny mirror."], [60.56, 64.1, "It peeks behind your teeth. Hello, back teeth!"], [64.5, 65.74, "Tap the squirter."], [67.54, 71.66, "Pssst! A little water. Whoosh! A little wind."], [72.06, 73.34, "Tap the little straw."], [75.14, 79.6, "Slurrrp! It drinks up the water. It sounds so funny!"], [80.0, 81.36, "Tap the tiny brush."], [83.16, 87.76, "Bzzzz. It spins and makes your teeth shiny. It tickles!"], [88.36, 89.92, "Drag the cup to Yeti."], [92.12, 97.34, "Swish, swish, and spit. Ptooey! Here, spitting is allowed."], [98.04, 104.26, "Now here's a secret signal. If you want a break, just raise your hand, and everybody stops."], [104.66, 106.46, "Tap Yeti's hand to try it."], [108.46, 110.36, "See? Everybody stops."], [111.06, 113.88, "All done! Look at those shiny teeth!"], [114.38, 116.88, "Sometimes, you even get to pick a sticker."], [117.18, 118.48, "Drag one onto Yeti."], [120.68, 128.48, "Now it's your turn to explore! Tap the chair, the light, the X-ray machine, or any tool, and learn how it works!"]], "he": [[0.8, 4.79, "זאת מרפאת השיניים. לחצו על הדלת כדי להיכנס!"], [8.19, 13.37, "החדר הזה מלא בהמצאות מגניבות, וכולן עוזרות לשיניים שלכם."], [13.97, 16.69, "הנה הכיסא הכי מגניב שראיתם בחיים."], [17.09, 19.06, "לחצו על הכיסא כדי להרים אותו."], [21.06, 23.43, "למעלה... למעלה... למעלה!"], [23.93, 25.57, "דחפו את הכיסא אחורה."], [27.77, 31.03, "הוא נוטה אחורה, כמו חללית שמתכוננת לטוס."], [31.63, 33.61, "גררו את הסינר אל ייטי."], [35.81, 37.9, "שרשרת קטנה מחזיקה אותו."], [38.5, 40.05, "לחצו על המנורה הגדולה."], [42.05, 46.69, "היא כמו שמש קטנה, וככה אפשר לראות את כל השיניים שלכם."], [47.39, 51.67, "זאת מכונת הרנטגן. לפעמים היא מצלמת את השיניים שלכם."], [52.07, 54.47, "לחצו על המכונה, ואל תזוזו."], [56.47, 60.06, "קליק! עכשיו אפשר לראות את השיניים מבפנים!"], [60.76, 61.94, "והנה הכלים!"], [62.34, 64.05, "לחצו על המראה הקטנטנה."], [65.85, 69.66, "היא מציצה מאחורי השיניים. שלום, שיניים אחוריות!"], [70.06, 71.36, "לחצו על המתז."], [73.16, 76.55, "פססט! קצת מים. ווש! קצת רוח."], [76.95, 78.48, "לחצו על הקשית הקטנה."], [80.28, 84.24, "היא שותה את המים. איזה צליל מצחיק!"], [84.64, 86.5, "לחצו על המברשת הקטנטנה."], [88.3, 92.74, "בזזזז. היא מסתובבת ומבריקה את השיניים. זה מדגדג!"], [93.34, 95.11, "גררו את הכוס אל ייטי."], [97.31, 101.82, "שוטפים, שוטפים, ויורקים. טפו! כאן מותר לירוק."], [102.52, 108.97, "ועכשיו, סימן סודי. אם אתם רוצים הפסקה, פשוט מרימים יד, וכולם עוצרים."], [109.37, 111.85, "לחצו על היד של ייטי כדי לנסות."], [113.85, 115.79, "ראיתם? כולם עוצרים."], [116.49, 119.5, "סיימנו! תראו איזה שיניים מבריקות!"], [120.0, 122.5, "לפעמים אפילו אפשר לבחור מדבקה."], [122.8, 124.5, "גררו אחת אל ייטי."], [126.7, 135.61, "עכשיו תורכם לחקור! לחצו על הכיסא, על המנורה, על מכונת הרנטגן, או על כל כלי אחר, ותגלו איך הם עובדים!"]]};
   // Where the movie stops until the child presses the white circle.
   var GATES = {"en": [{"id": "door", "on": 4.0, "stop": 6.35, "x": 0.5712, "y": 0.6465, "cut": 7.75}, {"id": "chair_p", "on": 16.7, "stop": 18.94, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 23.14, "stop": 24.42, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 30.7, "stop": 31.98, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 36.56, "stop": 38.61, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 49.6, "stop": 51.54, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 58.46, "stop": 60.41, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 65.44, "stop": 67.39, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 73.04, "stop": 74.99, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 81.06, "stop": 83.01, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 89.62, "stop": 90.9, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 106.16, "stop": 107.71, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 118.18, "stop": 119.46, "x": 0.4921, "y": 0.3359}], "he": [{"id": "door", "on": 4.49, "stop": 6.84, "x": 0.5712, "y": 0.6465, "cut": 8.24}, {"id": "chair_p", "on": 18.76, "stop": 21.0, "x": 0.5668, "y": 0.668}, {"id": "back_p", "on": 25.27, "stop": 26.55, "x": 0.3792, "y": 0.2077}, {"id": "bib_p", "on": 33.31, "stop": 34.59, "x": 0.6591, "y": 0.3555}, {"id": "light_p", "on": 39.75, "stop": 41.8, "x": 0.3735, "y": 0.1484}, {"id": "xray_p", "on": 54.17, "stop": 56.11, "x": 0.4376, "y": 0.1343}, {"id": "mirror_p", "on": 63.75, "stop": 65.7, "x": 0.645, "y": 0.4082}, {"id": "squirt_p", "on": 71.06, "stop": 73.01, "x": 0.6889, "y": 0.3691}, {"id": "straw_p", "on": 78.18, "stop": 80.13, "x": 0.7258, "y": 0.3691}, {"id": "brush_p", "on": 86.2, "stop": 88.15, "x": 0.7627, "y": 0.3691}, {"id": "cup_p", "on": 94.81, "stop": 96.09, "x": 0.6986, "y": 0.5859}, {"id": "hand_p", "on": 111.55, "stop": 113.1, "x": 0.445, "y": 0.5251}, {"id": "stick_p", "on": 124.2, "stop": 125.48, "x": 0.4921, "y": 0.3359}]};
   var WORDS = {
@@ -199,7 +212,29 @@
     movie.play();
     setTimeout(function () { if (!waiting && !live) spot.hidden = true; }, 240);
   }
+  var cc = document.getElementById('cc'), cap = document.getElementById('cap'), ccOn = false, capText = '';
+  try { ccOn = localStorage.getItem('dentist-cc') === '1'; } catch (e) {}
+  function setCC(on) {
+    ccOn = on;
+    cc.setAttribute('aria-pressed', String(on));
+    try { localStorage.setItem('dentist-cc', on ? '1' : '0'); } catch (e) {}
+    showCap();
+  }
+  // the line being said; while the movie waits for a press, the prompt it just gave stays up
+  function showCap() {
+    var t = movie.currentTime, line = null;
+    if (ccOn && lang) CAPS[lang].forEach(function (c) { if (t >= c[0] - 0.1 && (t < c[1] + 0.8 || waiting)) line = c; });
+    var text = line ? line[2] : '';
+    if (text === capText) return;
+    capText = text;
+    cap.textContent = text;
+    cap.dir = lang && WORDS[lang].dir;
+    cap.hidden = !text;
+  }
+  cc.addEventListener('click', function () { setCC(!ccOn); });
+  cc.setAttribute('aria-pressed', String(ccOn));
   function watch() {
+    showCap();
     var t = movie.currentTime;
     if (!movie.paused && !waiting) {
       GATES[lang].some(function (g) {
