@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex">
@@ -12,12 +12,12 @@
 <meta name="apple-mobile-web-app-title" content="Dentist">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="art/home-icon.png">
-<title>ביקור במרפאת השיניים | Zizzle Inventions</title>
-<meta name="description" content="סרטון קצר שמכיר לילדים את מרפאת השיניים: הכיסא, המנורה, צילום הרנטגן והכלים.">
+<title>A visit to the dentist | Zizzle Inventions</title>
+<meta name="description" content="A short movie that shows children the dentist&#39;s office: the chair, the light, the X-ray machine and the tools.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Zizzle Inventions">
-<meta property="og:title" content="ביקור במרפאת השיניים">
-<meta property="og:description" content="סרטון קצר שמכיר לילדים את מרפאת השיניים: הכיסא, המנורה, צילום הרנטגן והכלים.">
+<meta property="og:title" content="A visit to the dentist">
+<meta property="og:description" content="A short movie that shows children the dentist&#39;s office: the chair, the light, the X-ray machine and the tools.">
 <meta property="og:image" content="https://noamlamdan.github.io/dentist-office/preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -91,13 +91,9 @@
   <video id="movie" poster="media/poster.jpg" playsinline preload="metadata" disablepictureinpicture></video>
   <button id="hit" type="button" tabindex="-1" aria-hidden="true"></button>
   <button id="spot" type="button" aria-label="OK" hidden></button>
-  <button id="play" type="button" aria-label="הפעלה"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1.2 1.2 0 0 0 1.8 1l14-8.5a1.2 1.2 0 0 0 0-2L7.8 2.5a1.2 1.2 0 0 0-1.8 1Z" fill="#F285B5"/></svg></i></button>
+  <button id="play" type="button" aria-label="Play"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3.5v17a1.2 1.2 0 0 0 1.8 1l14-8.5a1.2 1.2 0 0 0 0-2L7.8 2.5a1.2 1.2 0 0 0-1.8 1Z" fill="#F285B5"/></svg></i></button>
   <button id="cc" type="button" aria-pressed="false" aria-label="Captions / כתוביות"></button>
   <div id="cap" hidden></div>
-  <div class="lang" role="group" aria-label="Language / שפה">
-    <button type="button" data-lang="he" lang="he" aria-pressed="true">עברית</button>
-    <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
-  </div>
   <div id="swipe" aria-hidden="true" hidden><svg viewBox="0 0 24 24"><path d="M12 20V5M5 11.5 12 4.5l7 7" fill="none" stroke="#F285B5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   <footer>
     <a class="brand" href="https://www.zizzlelab.com/" target="_blank" rel="noopener"><img src="art/zizzlelab.png" alt="Zizzlelab"></a>
@@ -152,7 +148,7 @@
   function remember(l) {
     try { localStorage.setItem('dentist-lang', l); } catch (e) {}
   }
-  function firstLang() {
+  function firstLang() { return 'en';
     var asked = new URLSearchParams(location.search).get('lang');
     if (WORDS[asked]) return asked;
     if (WORDS[saved()]) return saved();
